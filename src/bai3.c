@@ -1,40 +1,36 @@
 #include <stdio.h>
 
+#ifndef MAX_COLS
 #define MAX_COLS 100
+#endif
 
 // --- INTERFACE BẮT BUỘC - KHÔNG ĐỔI CHỮ KÝ HÀM ---
-void lamMoMaTran(int src[][MAX_COLS], int dest[][MAX_COLS], int row, int col);
+void lamMoMaTran(int src[100][MAX_COLS], int dest[100][MAX_COLS], int rows, int cols);
 
 #ifndef UNIT_TEST
 int main() {
-    int row, col;
+    int rows, cols;
+    printf("Nhap so hang: ");
+    scanf("%d", &rows);
+    printf("Nhap so cot: ");
+    scanf("%d", &cols);
+
     int src[100][MAX_COLS];
-    int dest[100][MAX_COLS];
+    int dest[100][MAX_COLS] = {0};
 
-    printf("Nhap so hang (row > 0): ");
-    scanf("%d", &row);
-    printf("Nhap so cot  (col > 0): ");
-    scanf("%d", &col);
-
-    if (row <= 0 || col <= 0 || row > 100 || col > 100) {
-        printf("Kich thuoc ma tran khong hop le!\n");
-        return 0;
-    }
-
-    printf("Nhap cac diem anh cua ma tran (%d x %d):\n", row, col);
-    for (int i = 0; i < row; i++) {
-        for (int j = 0; j < col; j++) {
-            printf("  src[%d][%d] = ", i, j);
+    printf("Nhap cac phan tu cua ma tran:\n");
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
             scanf("%d", &src[i][j]);
         }
     }
 
-    lamMoMaTran(src, dest, row, col);
+    lamMoMaTran(src, dest, rows, cols);
 
-    printf("\n--- MA TRAN ANH DA LAM MO (BOX BLUR 3x3) ---\n");
-    for (int i = 0; i < row; i++) {
-        for (int j = 0; j < col; j++) {
-            printf("%4d ", dest[i][j]);
+    printf("\n--- MA TRAN SAU KHI LAM MO (BOX BLUR) ---\n");
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            printf("%d\t", dest[i][j]);
         }
         printf("\n");
     }
@@ -44,14 +40,35 @@ int main() {
 #endif
 
 // --- SINH VIÊN VIẾT CODE CỦA HÀM DƯỚI ĐÂY ---
-void lamMoMaTran(int src[][MAX_COLS], int dest[][MAX_COLS], int row, int col) {
-    // TODO: Áp dụng bộ lọc làm mờ Box Blur 3x3 cho ma trận ảnh src lưu sang dest
-    // Với mỗi ô (i, j):
-    //   - Xét các ô lân cận (r, c) trong phạm vi [i-1 .. i+1] và [j-1 .. j+1]
-    //   - CHỈ lấy các ô hợp lệ: 0 <= r < row và 0 <= c < col
-    //   - Tính: dest[i][j] = tong_cac_o_hop_le / so_luong_o_hop_le (phép chia nguyên)
-    // Giữ nguyên ma trận gốc src.
-    // LƯU Ý: Cực kỳ cẩn thận xử lý biên (ô góc có 4 lân cận, ô cạnh có 6 lân cận, ô tâm có 9 lân cận)
-    // Tuyệt đối không dùng lệnh in ra màn hình bên trong hàm này!
-    
+void lamMoMaTran(int src[100][MAX_COLS], int dest[100][MAX_COLS], int rows, int cols) {
+    // TODO: Viết thuật toán Box Blur 3x3
+    // Yêu cầu tuyệt đối: Không dùng printf trong hàm này!
+
+    for (int i = 0; i < rows; i++) {
+        for (int j = 0; j < cols; j++) {
+            int sum = 0;
+            int count = 0;
+
+            // Duyệt qua vùng lân cận 3x3 xung quanh điểm (i, j)
+            for (int di = -1; di <= 1; di++) {
+                for (int dj = -1; dj <= 1; dj++) {
+                    int ni = i + di;
+                    int nj = j + dj;
+
+                    // Kiểm tra xem ô lân cận có nằm trong biên của ma trận hay không
+                    if (ni >= 0 && ni < rows && nj >= 0 && nj < cols) {
+                        sum += src[ni][nj];
+                        count++;
+                    }
+                }
+            }
+
+            // Tính trung bình cộng theo số lượng ô lân cận thực tế
+            if (count > 0) {
+                dest[i][j] = sum / count;
+            } else {
+                dest[i][j] = src[i][j];
+            }
+        }
+    }
 }

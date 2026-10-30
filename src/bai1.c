@@ -6,29 +6,22 @@ void lamMinTinHieu(float raw[], float smooth[], int n);
 #ifndef UNIT_TEST
 int main() {
     int n;
-    float raw[100];
-    float smooth[100];
-
-    printf("Nhap so luong mau tin hieu cam bien (n > 0): ");
+    printf("Nhap so luong phan tu: ");
     scanf("%d", &n);
 
-    if (n <= 0) {
-        printf("So luong mau khong hop le!\n");
-        return 0;
-    }
-
-    printf("Nhap %d gia tri tin hieu tho:\n", n);
+    float raw[n], smooth[n];
     for (int i = 0; i < n; i++) {
-        printf("  raw[%d] = ", i);
+        printf("Nhap raw[%d]: ", i);
         scanf("%f", &raw[i]);
     }
 
     lamMinTinHieu(raw, smooth, n);
 
-    printf("\n--- KET QUA LAM MIN TIN HIEU (MOVING AVERAGE) ---\n");
-    printf("Tin hieu goc: ");
+    printf("\n--- KET QUA LAM MIN TIN HIEU ---");
+    printf("\nMang goc: ");
     for (int i = 0; i < n; i++) printf("%.2f ", raw[i]);
-    printf("\nTin hieu min: ");
+    
+    printf("\nMang sau khi lam min: ");
     for (int i = 0; i < n; i++) printf("%.2f ", smooth[i]);
     printf("\n");
 
@@ -38,13 +31,25 @@ int main() {
 
 // --- SINH VIÊN VIẾT CODE CỦA HÀM DƯỚI ĐÂY ---
 void lamMinTinHieu(float raw[], float smooth[], int n) {
-    // TODO: Tính mảng smooth[] từ mảng raw[] theo thuật toán trung bình trượt cửa sổ k = 3
-    // QUY TẮC XỬ LÝ BIÊN:
-    // - Nếu n = 1: smooth[0] = raw[0]
-    // - Với n >= 2:
-    //   + Tại ô đầu (i = 0):     smooth[0] = (raw[0] + raw[1]) / 2.0f
-    //   + Tại ô cuối (i = n-1):  smooth[n-1] = (raw[n-2] + raw[n-1]) / 2.0f
-    //   + Tại ô giữa (1 <= i <= n-2): smooth[i] = (raw[i-1] + raw[i] + raw[i+1]) / 3.0f
-    // LƯU Ý: Tuyệt đối không đọc tràn mảng và không dùng lệnh in ra màn hình trong hàm!
+    // TODO: Viết code thuật toán Moving Average
+    // Yêu cầu: Không được dùng printf ở đây!
     
+    if (n <= 0) return;
+
+    // Trường hợp đặc biệt khi mảng chỉ có 1 phần tử
+    if (n == 1) {
+        smooth[0] = raw[0];
+        return;
+    }
+
+    // Xử lý phần tử đầu tiên (biên trái)
+    smooth[0] = (raw[0] + raw[1]) / 2.0f;
+
+    // Xử lý các phần tử ở giữa
+    for (int i = 1; i < n - 1; i++) {
+        smooth[i] = (raw[i - 1] + raw[i] + raw[i + 1]) / 3.0f;
+    }
+
+    // Xử lý phần tử cuối cùng (biên phải)
+    smooth[n - 1] = (raw[n - 2] + raw[n - 1]) / 2.0f;
 }
